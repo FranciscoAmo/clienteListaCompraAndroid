@@ -15,6 +15,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
 public interface RetrofitService {
@@ -24,18 +25,18 @@ public interface RetrofitService {
 
 
 
+    // Usuarios
+    // llamadas del login
 
-// lllamadas del login
-
+    // logearse
     @FormUrlEncoded
-    //@Headers("Content-Type: application/x-www-form-urlencoded")
     @POST("login/signin")
     Call<ResponseLogin> logIn(@Field("email") String email,
                               @Field("password") String password);
 
 
 
-
+    //registrar nuevo usuario
     @FormUrlEncoded
     @POST("login/signup")
     Call<ResponseLogin> logUp(
@@ -44,13 +45,24 @@ public interface RetrofitService {
             @Field("displayName") String displayName
             );
 
+    // Listas
 
-    // leo las listas del usuario
+
+    // leo Todas las listas del usuario
 
     @GET("lista/")
     Call<ListProduct.BaseList> getallList( @Header("Authorization") String token);
 
+    @FormUrlEncoded
+    @POST("lista/")
+    Call<ListProduct.List> createList( @Header("Authorization") String token,
+                                           @Field("nameList") String nameList);
 
+
+    @FormUrlEncoded
+    @PUT("lista/")
+    Call<ListProduct.List> removefromList(@Header("Authorization") String token,
+                                              @Field("_id")String idlist);
 /*
     @FormUrlEncoded
     @POST("product")

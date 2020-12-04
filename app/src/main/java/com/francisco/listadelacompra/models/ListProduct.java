@@ -50,6 +50,9 @@ public class ListProduct implements Serializable {
 
     public class BaseList implements Serializable{
 
+        @SerializedName("message")
+        @Expose
+        private String message;
         @SerializedName("list")
         @Expose
         private java.util.List<List> list = null;
@@ -62,6 +65,13 @@ public class ListProduct implements Serializable {
             this.list = list;
         }
 
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
     }
 
 

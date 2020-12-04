@@ -76,17 +76,17 @@ public class MainActivity extends AppCompatActivity  {
 
 
 
-    // muestra el menu action bar
+    // muestra el menu_login action bar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
         MenuInflater inflate=getMenuInflater();
-        inflate.inflate(R.menu.menu,menu);
+        inflate.inflate(R.menu.menu_login,menu);
         return super.onCreateOptionsMenu(menu);
     }
 
 
-// selecciona la opcion del menu
+// selecciona la opcion del menu_login
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {

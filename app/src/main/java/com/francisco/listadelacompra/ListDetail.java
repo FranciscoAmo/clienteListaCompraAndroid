@@ -2,22 +2,37 @@ package com.francisco.listadelacompra;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.francisco.listadelacompra.models.ListProduct;
+import com.francisco.listadelacompra.retrofitUtils.RetrofitAdapter;
+import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class ListDetail extends AppCompatActivity {
 
@@ -48,6 +63,11 @@ public class ListDetail extends AppCompatActivity {
     private TextView unidadProductdetail;
     private TextView precioProductdetail;
     private TextView totalProductdetail;
+
+
+    private String token;
+
+    private SharedPreferences misPreferencias;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,8 +110,12 @@ public class ListDetail extends AppCompatActivity {
 
         asignar_valores();
 
+
+        leerPreferencias();
+
     }
 
+    // inicailizo vistas
     private void _init() {
         // vinculo vistas
         nombreLista=(TextView)findViewById(R.id.nameListDetail);
@@ -105,6 +129,85 @@ public class ListDetail extends AppCompatActivity {
 
     }
 
+    // preferencias
+    // lee las preferencias por si ya esta logeado de antes y guardo el token
+    private void leerPreferencias() {
+
+        misPreferencias = getSharedPreferences("preferences", MODE_PRIVATE);
+        token = misPreferencias.getString("token", "");
+
+
+    }
+
+
+
+
+    // toolbar
+
+    // muestra el menu_login action bar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflate=getMenuInflater();
+        inflate.inflate(R.menu.menu_products_list,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+// selecciona la opcion del menu_login
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.exitList:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("SALIR DE LA LISTA");
+                builder.setMessage("¿Seguro que quieres salir de la lista?");
+
+                builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.i("BORRADO",listacogida.getNameList().toString());
+                       eliminarLista(listacogida.getId().toString());
+
+                    }
+                }) ;
+
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    // CALLERS
+    public void eliminarLista(String listid){
+        Call<ListProduct.List> call = RetrofitAdapter.getApiService().removefromList("Bearer " + token,listid);
+        Log.i("nombre lista a eliminar:",listid);
+        call.enqueue(new ResponseRemoveFromListCallback());
+
+    }
+
+    // metodo que sale de la actividad
+    private void exitActivity() {
+        Toast.makeText(getApplicationContext(),"eliminada la lista",Toast.LENGTH_SHORT).show();
+
+
+        this.finish();
+    }
+
+
+
+
     // asigno valores a la vista principal
     private void asignar_valores(){
 
@@ -114,7 +217,7 @@ public class ListDetail extends AppCompatActivity {
 
     }
 
-
+        // transmorma una Lista de Objetos en un arry de Objetos para el edaptador
     private <T> ArrayList<T> pasarAArrayList(List<T> lista){
         ArrayList<T> listaarraylistdevuelta= new ArrayList<T>();
 
@@ -210,5 +313,48 @@ public class ListDetail extends AppCompatActivity {
 
 
     }
+
+
+    // class Callback que elimina usuarios de las listas
+    private class ResponseRemoveFromListCallback implements retrofit2.Callback<ListProduct.List> {
+        @Override
+        public void onResponse(Call<ListProduct.List> call, Response<ListProduct.List> response) {
+
+            // peticion correcta code 200
+            if (response.isSuccessful()) {
+
+                // si no se ha podido logear da fallo code != 201
+                if (response.code() == 200) {
+
+                    exitActivity();
+
+
+                } else {
+
+                    try {
+                        // obtengo el cuerpo del error
+
+                        String errorBody = response.errorBody().string();
+
+                        //parseo el errorBody para obtener el campo message del servidor
+                        Gson gson = new Gson();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+
+        }
+
+
+
+        @Override
+        public void onFailure(Call<ListProduct.List> call, Throwable t) {
+
+        }
+    }
+
 
 }
