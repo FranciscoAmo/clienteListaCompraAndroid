@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +17,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.francisco.listadelacompra.dialogs.DialogoNuevaLista;
+import com.francisco.listadelacompra.dialogs.DialogNewList;
 import com.francisco.listadelacompra.models.ListProduct;
 import com.francisco.listadelacompra.retrofitUtils.RetrofitAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,40 +33,45 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class ListProducts extends AppCompatActivity implements ListView.OnItemClickListener ,DialogoNuevaLista.ListenerNameList{
+public class ListProducts extends AppCompatActivity implements ListView.OnItemClickListener , DialogNewList.ListenerNameList{
 
-    // clases de las vistas
+    // VISTAS
     TextView Nombre;
     TextView email;
 
     FloatingActionButton fab;
+    FloatingActionButton fabregresar;
 
     private ListView Lista;
 
 
-    // clases de las vistas del adaptador
+    // VISTAS DEL ADAPTADOR
     private TextView nombreListaadpatdor;
     private TextView cantidadUsuarioadaptador;
     private TextView cantidadProductosadaptador;
+    private TextView numeroDeListas;
 
-
+    // ARRAYLIST DE LAS LISTAS A MOSTRAR
     private ArrayList<ListProduct.List> listaToShow = new ArrayList<ListProduct.List>();
 
+    // PREFERENCIAS
     private SharedPreferences misPreferencias;
 
+    // VARIABLES A GUARDAR LOCALMENTE
     private String currentUseremail;
     private String currentDisplayName;
 
+    // VARIABLE DEL TOKEN PARA REALIZAR LLAMADAS
     private static String token;
 
-    // clase del adpatdor personalizado del listview
+    // CLASE DEL ADAPTADOR
     AdaptadorPersonalizado adap_personalizado;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activiry_list_products_content);
+        setContentView(R.layout.content_activity_list_products);
 
 
         // obtengo instancia de las preferencias
@@ -81,19 +86,35 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
         _init();
 
         //leo y guardo el token de las preferencias
-        leerPreferencias();
+        readPreferences();
 
-        // obtengo los valores de las listas
-        obtenerValoresLista();
 
         // establezco acciones de los botones
-        establecerAccionesBotones();
+        establisedActionButtons();
     }
+
+
+    // obtengo los valores de las listas se llama cada vez que se ponga el foco en la actividad incluso en la primera instancia
+    @Override
+    protected void onResume() {
+        super.onResume();
+        listaToShow.clear();  // limpio la lista de listas de productos
+        returnValuesFromApi();
+
+    }
+
 
     // VINCUALCION DE VISTAS
     public void _init() {
 
+        numeroDeListas = ( TextView)findViewById(R.id.numOfLists);
+
+        // botones floating
+        // botones superiores
+
+        // boton inferior para
         fab = (FloatingActionButton) findViewById(R.id.fab);
+        fabregresar = (FloatingActionButton)findViewById(R.id.fabregresarlist);
 
         Nombre = (TextView) findViewById(R.id.usuario);
         email = (TextView) findViewById(R.id.email);
@@ -105,7 +126,7 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
 
 
     // lee las preferencias por si ya esta logeado de antes y guardo el token
-    private void leerPreferencias() {
+    private void readPreferences() {
 
         misPreferencias = getSharedPreferences("preferences", MODE_PRIVATE);
         token = misPreferencias.getString("token", "");
@@ -118,34 +139,48 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
 
     // BOTON Y LLAMADA A DIALOGOS
   // establezco listener de botones
-    public void establecerAccionesBotones(){
+    public void establisedActionButtons(){
         // boton flotante
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                // abro el dialogo
-                DialogoNuevaLista dialogo=new DialogoNuevaLista();
+                // abro el dialogo para añadir una nueva lista
+                DialogNewList dialogo=new DialogNewList();
                 dialogo.show(getSupportFragmentManager(),"dialogoNuevaLista");
                 // recogo el valor en el metodo de la interface ListernerName.sendNameList();
 
-
             }
         });
+
+
+        fabregresar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               finish();
+            }
+        });
+
+
 
     }
 
     // recogo el valor del nombre de la lista y hago la peticion al servidor para crearlo
     @Override
     public void sendNameList(String nombre) {
-         createList(nombre);
+
+        listaToShow.clear();
+        // llamada a la api
+        createList(nombre);
     }
 
-    // LLAMADAs A LOS CALLBACKS
+
+
+    // LLAMADAS A LAS API
 
     // obtengo los valores de la lista
-    private void obtenerValoresLista() {
-
+    private void returnValuesFromApi() {
+        listaToShow.clear();
         // llamo a la api
         Call<ListProduct.BaseList> call = RetrofitAdapter.getApiService().getallList("Bearer " + token);
         call.enqueue(new ResponseListCallback());
@@ -159,13 +194,7 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
     }
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        obtenerValoresLista();
-
-    }
-
+    // ESTABLECER ACCIONES BOTONES
     // metodo para ejecutar acciones segun la lista que se seleccione
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -174,8 +203,7 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
 
         ListProduct.List listaselecionada= listaToShow.get(position);
 
-        // muestro un toast
-        Toast.makeText(this, "selecionada la lista " + listaToShow.get(position).getNameList().toString(), Toast.LENGTH_SHORT).show();
+
 
         // abro otra actividad con el detalle de la lista
         Intent i = new Intent(this, ListDetail.class);
@@ -186,11 +214,7 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
     }
 
 
-
-
-
-
-            // ADAPTADOR PERSONALIZADO PARA MOSTRAR EL LISTADO
+      // ADAPTADORES
 
         // clase adaptador dentro de la clase del main debo  extiende dArrayAdapter y se sobreescribe getView
         public class AdaptadorPersonalizado extends ArrayAdapter {
@@ -227,10 +251,7 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
 
         }
 
-
-
-
-    //RETORNOS DE LOS CALLBACKS
+    //RETORNOS DE LOS valores
 
     // devuelvo el resultado de todas las listas
     private void returnAllListFormUsers(List<ListProduct.List> listas) {
@@ -242,18 +263,20 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
         }
 
 
-        // añado el edaptado personalizado
+        // añado el adaptado personalizado
         adap_personalizado = new AdaptadorPersonalizado(getApplicationContext(), listaToShow);
         Lista.setAdapter(adap_personalizado);
         Lista.setOnItemClickListener(this);
 
+        // establezco el valor del numero de listas
+        numeroDeListas.setText(" Numero de listas : "+ listaToShow.size());
 
     }
 
 
-    // respuesta al crear una lista
 
-    // metodo que devuelve la lista
+
+    // metodo que devuelve la lista al haber cambios
     private void returnListCreated(ListProduct.List lista) {
         // la añado al arrayList de la vista
         listaToShow.add(lista);
@@ -263,8 +286,13 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
     }
 
 
+    // METODO QUE MUETRA EL TOAST
+    private void showToastMessage(String message) {
+        // devuelvo el valor
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 
 
+    }
 
 
     //CLASES CALLBACK DE LAS LLAMADAS A LA API
@@ -277,26 +305,45 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
                 // peticion correcta code 200
                 if (response.isSuccessful()) {
 
-                    // si no se ha podido logear da fallo code != 201
-                    if (response.code() == 201) {
+                    returnValuesFromApi();
 
-                         obtenerValoresLista();
                   } else {
+                        // si no se ha podido logear da fallo code != 200
 
                         try {
-                            // obtengo el cuerpo del error
-
+                            // obtengo el cuerpo de la respuesta si ha habido un error
                             String errorBody = response.errorBody().string();
 
-                            //parseo el errorBody para obtener el campo message del servidor
-                            Gson gson = new Gson();
+                            // instancio la utilidad gson
+                            Gson gson=new Gson();
 
-                   } catch (IOException e) {
+                            // lo parsea
+                            JsonObject jsonObject = gson.fromJson(errorBody, JsonObject.class);
+                            if (jsonObject!=null && jsonObject.has("message") && !jsonObject.get("message").isJsonNull()) {
+                                // obtengo el string con el mensage
+                                String messageError=  jsonObject.get("message").getAsString();
+
+                                // muestro un toast con el error
+                                showToastMessage(messageError);
+                                // si se a detenido por la autentidicacion vamos al login
+                                if(messageError.equals("No tienes autorizacion")|| messageError.equals("tiempo expirado vulevete a loggear")){
+                                    // hago que vaya al login
+                                    // hago que vaya al login
+                                    Intent i = new Intent(getApplicationContext(),MainActivity.class);
+                                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(i);
+                                }
+
+
+
+                            }
+
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
 
-                }
+
 
             }
 
@@ -320,7 +367,7 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
         public void onResponse(Call<ListProduct.BaseList> call, Response<ListProduct.BaseList> response) {
             // peticion correcta code 200
             if (response.isSuccessful()) {
-                if (response.code() == 200) {
+
                     // obtengo la respuesta y la parseo a una clase java clase list
                     ListProduct.BaseList baseList = response.body();
 
@@ -332,28 +379,37 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
                     returnAllListFormUsers(listas);
 
 
-                }
+
             } else {
                 // si no se ha podido logear da fallo code != 200
 
-
                 try {
-                    // obtengo el cuerpo del error
-
+                    // obtengo el cuerpo de la respuesta si ha habido un error
                     String errorBody = response.errorBody().string();
 
-                    //parseo el errorBody para obtener el campo message del servidor
-                    Gson gson = new Gson();
-/*
+                    // instancio la utilidad gson
+                    Gson gson=new Gson();
+
+                    // lo parsea
                     JsonObject jsonObject = gson.fromJson(errorBody, JsonObject.class);
                     if (jsonObject!=null && jsonObject.has("message") && !jsonObject.get("message").isJsonNull()) {
+                        // obtengo el string con el mensage
                         String messageError=  jsonObject.get("message").getAsString();
 
                         // muestro un toast con el error
-                        devolverResultado(messageError);
-                    }
-*/
+                        showToastMessage(messageError);
+                        // si se a detenido por la autentidicacion vamos al login
+                        if(messageError.equals("No tienes autorizacion")|| messageError.equals("tiempo expirado vulevete a loggear")){
+                            // hago que vaya al login
+                            // hago que vaya al login
+                            Intent i = new Intent(getApplicationContext(),MainActivity.class);
+                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(i);
+                        }
 
+
+
+                    }
 
                 } catch (IOException e) {
                     e.printStackTrace();

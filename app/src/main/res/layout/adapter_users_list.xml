@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp">
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="212dp"
+        android:layout_height="48dp"
+        android:layout_weight="0.2"
+        android:background="#C7E4F3"
+        app:srcCompat="@drawable/list" />
+
     <TextView
         android:id="@+id/namelistdapter"
-        android:layout_width="712dp"
-        android:layout_height="39dp"
-        android:layout_weight="0.7"
+        android:layout_width="577dp"
+        android:layout_height="48dp"
+        android:layout_weight="0.4"
         android:fontFamily="sans-serif-medium"
         android:textAlignment="center"
         android:textColor="@android:color/holo_blue_dark"
@@ -17,20 +26,21 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_weight="0.3"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="0.6"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/textView4"
-                android:layout_width="331dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
                 android:text="Usuarios:"
                 android:textAlignment="center"
                 android:textStyle="italic" />
@@ -38,21 +48,22 @@
             <TextView
                 android:id="@+id/numOfUsers"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.1"
+                android:layout_height="match_parent"
+                android:layout_weight="0.8"
                 android:textColor="@color/design_default_color_primary" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="0.4"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/textView6"
-                android:layout_width="334dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
                 android:text="Productos:"
                 android:textAlignment="center"
                 android:textStyle="italic" />
@@ -60,8 +71,8 @@
             <TextView
                 android:id="@+id/numOfProducts"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.1"
+                android:layout_height="match_parent"
+                android:layout_weight="0.8"
                 android:textColor="@color/design_default_color_primary" />
         </LinearLayout>
 

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/backgrund_market"
+    android:orientation="vertical"
+    android:padding="10dp"
+    tools:context=".TypeProducts">
+
+    <TextView
+        android:id="@+id/textView35"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:background="@android:color/holo_blue_dark"
+        android:gravity="center"
+        android:text="TIPOS DE PRODUCTOS"
+        android:textColor="@android:color/background_light"
+        android:textSize="24sp" />
+
+    <GridView
+        android:id="@+id/gridViewTypes"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/background_light"
+        android:numColumns="2" />
+
+</LinearLayout>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/backgrund_market"
+    android:orientation="vertical"
+    android:padding="10dp"
+    tools:context=".ProductsByType">
+
+    <TextView
+        android:id="@+id/textView33"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_blue_dark"
+        android:gravity="center"
+        android:text="PRODUCTOS DE"
+        android:textColor="@android:color/background_light"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/productTypeName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="#B5E0EC"
+        android:gravity="center"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:text="TextView"
+        android:textSize="24sp" />
+
+    <ImageView
+        android:id="@+id/imageType"
+        android:layout_width="104dp"
+        android:layout_height="97dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="4dp"
+        android:background="@android:color/background_light"
+        tools:srcCompat="@mipmap/carritolleno" />
+
+    <GridView
+        android:id="@+id/gridViewProductsByType"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/background_light"
+        android:numColumns="2" />
+</LinearLayout>

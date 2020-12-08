@@ -11,8 +11,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ListDetail"></activity>
-        <activity android:name=".Registrar" />
+        <activity android:name=".ProductsByType"></activity>
+        <activity android:name=".TypeProducts" />
+        <activity
+            android:name=".dialogs.PopUpActionsProducts"
+            android:theme="@style/AppTheme.popupStyles" />
+        <activity android:name=".dialogs.DialogAddUserToList" />
+        <activity android:name=".ListDetail" />
+        <activity android:name=".Register" />
         <activity android:name=".ListProducts" />
         <activity android:name=".MainActivity">
             <intent-filter>

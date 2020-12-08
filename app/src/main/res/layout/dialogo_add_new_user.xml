@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@android:color/holo_blue_dark"
+        android:gravity="center"
+        android:text="AÑADIR USUARIO"
+        android:textColor="@android:color/background_light"
+        android:textSize="24sp" />
+
+    <ImageView
+        android:id="@+id/imagendialogoUser"
+        android:layout_width="match_parent"
+        android:layout_height="105dp"
+        android:layout_margin="10dp"
+        app:srcCompat="@mipmap/usuarios" />
+
+    <EditText
+        android:id="@+id/editTextUserName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:ems="10"
+        android:hint="Correo del usuario a Añadir"
+        android:inputType="textPersonName" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/confirmUserbtndialog"
+            android:layout_width="match_parent"
+            android:layout_height="69dp"
+            android:layout_margin="10dp"
+            android:layout_weight="0.3"
+            android:background="@drawable/boton_azul_png"
+            android:text="confirmar" />
+
+        <Button
+            android:id="@+id/cancelUserbtndialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="0.7"
+            android:background="#D86F6F"
+            android:text="cancelar" />
+    </LinearLayout>
+
+</LinearLayout>

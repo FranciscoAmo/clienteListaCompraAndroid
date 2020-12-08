@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/textView16"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.5"
+        android:background="@android:color/holo_blue_dark"
+        android:gravity="center"
+        android:text="SELECCIONA CANTIDAD"
+        android:textColor="@android:color/background_light"
+        android:textSize="24sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="5dp"
+        android:layout_weight="3"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/nombreDialogProduct"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center" />
+
+        <ImageView
+            android:id="@+id/imagenDialogTipo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            tools:srcCompat="@tools:sample/avatars" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/cantidadDialogProducto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.7"
+            android:ems="10"
+            android:hint="Cantidad"
+            android:inputType="numberSigned" />
+
+        <TextView
+            android:id="@+id/unidaddialogProducto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_weight="0.3"
+            android:gravity="center"
+            android:text="TextView"
+            android:textColor="#235E75"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btndialogconfirmar"
+            android:layout_width="0dp"
+            android:layout_height="65dp"
+            android:layout_weight="0.7"
+            android:background="@drawable/boton_azul_png"
+            android:text="Confirmar" />
+
+        <Button
+            android:id="@+id/btndialogcancelar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:background="#D86F6F"
+            android:text="Cancelar" />
+    </LinearLayout>
+
+</LinearLayout>

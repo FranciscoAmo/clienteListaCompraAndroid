@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabregresardetail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="14dp"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:tint="@android:color/background_light"
+        app:backgroundTint="@android:color/holo_orange_light"
+        app:fabSize="mini"
+        app:srcCompat="?attr/actionModeCloseDrawable" />
+
+    <include
+        layout="@layout/activity_list_detail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="10dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabeliminarlist"
+            android:layout_width="wrap_content"
+            android:layout_height="75dp"
+            android:layout_gravity="top|end"
+            android:clickable="true"
+            android:paddingTop="10dp"
+            android:src="@mipmap/eliminar_foreground"
+            app:backgroundTint="#9BA8DF"
+            app:fabSize="mini"
+            app:maxImageSize="@android:dimen/app_icon_size"
+            app:srcCompat="@mipmap/eliminar_foreground" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabadduser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_marginStart="5dp"
+            android:clickable="true"
+            android:foregroundGravity="center_horizontal"
+            android:src="@drawable/usuarios_foreground"
+            app:backgroundTint="#9BA8DF"
+            app:fabSize="mini"
+            app:maxImageSize="@android:dimen/app_icon_size"
+            app:srcCompat="@drawable/usuarios_foreground" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabaddproduct"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:src="@drawable/carrito_foreground"
+            app:backgroundTint="#9BA8DF"
+            app:fabSize="mini"
+            app:maxImageSize="@android:dimen/app_icon_size"
+            app:srcCompat="@drawable/carrito_foreground" />
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

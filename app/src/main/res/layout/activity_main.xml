@@ -4,43 +4,80 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@mipmap/backgrund_market"
     android:gravity="center"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="ENTRAR" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="280dp"
+        android:layout_height="400dp"
+        android:background="@android:color/background_light">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="318dp"
-        android:layout_height="377dp" />
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@android:color/background_light"
+            android:gravity="center"
+            android:text="ENTRAR"
+            android:textColor="@color/design_default_color_primary_dark"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.502"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="265dp"
+            android:layout_height="344dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            app:layout_constraintVertical_bias="0.058"
+            app:srcCompat="@drawable/logo" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <EditText
         android:id="@+id/email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="16dp"
+        android:background="@android:color/background_light"
         android:ems="10"
-        android:hint="Usuario"
-        android:inputType="textPersonName" />
+        android:hint="Email"
+        android:inputType="textPersonName"
+        android:textColorHint="@color/design_default_color_primary"
+        android:textSize="24sp" />
 
     <EditText
         android:id="@+id/password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="16dp"
+        android:background="@android:color/background_light"
         android:ems="10"
         android:hint="Contraseña"
-        android:inputType="textPassword" />
+        android:inputType="textPassword"
+        android:textColorHint="@color/design_default_color_primary"
+        android:textSize="24sp" />
 
     <Button
         android:id="@+id/entrar"
         android:layout_width="178dp"
         android:layout_height="84dp"
-        android:background="@drawable/continuar"
-        android:gravity="right"
-        android:onClick="logIn" />
+        android:layout_marginTop="15dp"
+        android:background="@drawable/boton_azul_png"
+        android:gravity="center"
+        android:onClick="logIn"
+        android:text="Entrar"
+        android:textColor="?attr/colorBackgroundFloating" />
 
 </LinearLayout>

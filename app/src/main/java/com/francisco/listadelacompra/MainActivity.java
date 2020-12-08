@@ -8,6 +8,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import com.francisco.listadelacompra.models.ResponseLogin;
 import com.francisco.listadelacompra.retrofitUtils.RetrofitAdapter;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -31,21 +33,21 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity  {
 
-    // preferencias
+    // PREFERENCIAS
     SharedPreferences misPreferencias;
 
-    // para los permisos
+    // PERMISOS PARA SI LA API SE PUBLICA EN UNA DIRECCION DE INTENT
     private static final int REQUEST_INTERNET = 1;
 
-    // clases de las vistas
+    // VISTAS
     public TextView email;
     public TextView password;
-
     public Button entrar;
 
+    private FloatingActionButton fabregistrar;
 
 
-    // private
+    // VARIABLE QUE GUARDA EL PASSWORD LOCALMENTE
     private static String userPassword;
 
 
@@ -53,7 +55,7 @@ public class MainActivity extends AppCompatActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.content_activity_main);
 
         // inicio la vista
         _init();
@@ -61,22 +63,33 @@ public class MainActivity extends AppCompatActivity  {
         permisionCheck();
 
         // inicio preferencias
-        leerPreferencias();
+        readPreferences();
 
     }
 
-    // vinculacion de clases a vistas
+    // VINCULACION DE VISTAS
     public void _init(){
+
+        fabregistrar = (FloatingActionButton)findViewById(R.id.fabregistrar);
 
         email=(TextView)findViewById(R.id.email);
         password=(TextView)findViewById(R.id.password);
 
         entrar=(Button) findViewById(R.id.entrar);
+
+
+        fabregistrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(getApplicationContext(), Register.class);
+                startActivity(intent);
+            }
+        });
     }
 
 
 
-    // muestra el menu_login action bar
+    // MUESTRA EL TOOLBAR Y LOS BOTONES
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -86,40 +99,26 @@ public class MainActivity extends AppCompatActivity  {
     }
 
 
-// selecciona la opcion del menu_login
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch(item.getItemId()){
-            case R.id.registrar:
-                Intent intent=new Intent(this,Registrar.class);
-                startActivity(intent);
-
-                break;
-
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
 
-// lee las preferencias por si ya esta logeado de antes
-    private void leerPreferencias() {
+    // LEO LAS PREFERENCIAS
+    private void readPreferences() {
 
         misPreferencias = getSharedPreferences("preferences", MODE_PRIVATE);
         String nombre1 = misPreferencias.getString("email", "");
         String contraseña1 = misPreferencias.getString("password", "");
 
+        if(nombre1 != null && contraseña1 != null) {
+            // los introduzco en los campos
+            email.setText(nombre1);
+            password.setText((contraseña1));
 
-        // los introduzco en los campos
-        email.setText(nombre1);
-        password.setText((contraseña1));
 
-
+            email.setBackgroundColor(Color.YELLOW);
+            password.setBackgroundColor(Color.YELLOW);
+        }
 
     }
-
-
-
 
 
     // pide permisos de internet
@@ -131,35 +130,29 @@ public class MainActivity extends AppCompatActivity  {
 
             Toast.makeText(this, "No se puede Hacer peticiones a la API si no das permiso", Toast.LENGTH_LONG).show();
 
-
         }
-
 
 
     }
 
 
 
-
-    // se intenta logear
+    // METODO SE EJECUTAL AL CLICAR EN CONTINUAR
     public void logIn(View view){
-
 
         // obtengo el valor de los campos
         String email= this.email.getText().toString();
         String password=this.password.getText().toString();
 
 
-        // LLAMADA AL METODO PARA REGISTRASE
-        //httpMethod.logIn(email,password);
-        logearse(email,password);
-
-
+        // LLAMADA A LA API PARA REGISTRASE
+        ejecuteLoginAPI(email,password);
 
 
     }
 
-    private void logearse(String email, String password){
+    // METODOS DE LLAMADA A LA API
+    private void ejecuteLoginAPI(String email, String password){
         // guardo el password
         userPassword = password;
         // llamo a la api
@@ -168,7 +161,8 @@ public class MainActivity extends AppCompatActivity  {
     }
 
 
-    private void devolverResultado(String message) {
+    // METODO QUE MUETRA EL TOAST
+    private void showToastMessage(String message) {
         // devuelvo el valor
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 
@@ -176,12 +170,12 @@ public class MainActivity extends AppCompatActivity  {
     }
 
 
-    private void logearsecorrectamente(ResponseLogin responselogin) {
+    private void actionLoginCorrect(ResponseLogin responselogin) {
 
         // debo guardar los datos del login en el pref
-       editarpreferencias(responselogin);
+        editPreferences(responselogin);
 
-        // abro otra actividad si todo ha ido bien
+        // abro otra actividad si todo ha ido bien y envio los datos
         Intent intento=new Intent(this, ListProducts.class);
         intento.putExtra("nombreUsuario",responselogin.getUser().toString());
         intento.putExtra("emailUsuario",responselogin.getUserEmail().toString());
@@ -189,12 +183,10 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     // editar preferencias
-    private void editarpreferencias(ResponseLogin responseLogin) {
-        // preferencias sin editor grafico es del archivo "pref"
-        // archivo donde se guardaran las preferencias
-        // vinculo el editor de las preferencias
+    private void editPreferences(ResponseLogin responseLogin) {
+        // inicio las preferencias y guardo los valores
         SharedPreferences.Editor editor = misPreferencias.edit();
-        editor.putString("token",responseLogin.getToken());
+        editor.putString("token",responseLogin.getToken().toString());
         editor.putString("name",responseLogin.getUser());
         editor.putString("password",userPassword);
         editor.putString("email",responseLogin.getUserEmail());
@@ -202,8 +194,8 @@ public class MainActivity extends AppCompatActivity  {
     }
 
 
-
-    // clase que se encargara de la llamada
+    // RESPUESTAS DE LA API
+    // clase que se encarga de la respuesta de la api al registrase
     class ResponseLoginCallback implements Callback<ResponseLogin> {
         @Override
         public void onResponse(Call<ResponseLogin> call, Response<ResponseLogin> response) {
@@ -211,53 +203,50 @@ public class MainActivity extends AppCompatActivity  {
             // peticion correcta code 200
             if (response.isSuccessful()) {
                 if (response.code() == 200) {
+                    // cogo el cuerpo de la peticion
+                    //obtengo la clase responseLogin
                     ResponseLogin responselogin= response.body();
-                    String responsemessage = responselogin.getMessage().toString();
+
 
                     // muestro un toast de que se han logeado correctamente
-                    devolverResultado(responsemessage);
+                    showToastMessage(responselogin.getMessage().toString());
 
                     // ejecuto las acciones si se ha registrado correctamente
-                    logearsecorrectamente(responselogin);
+                    actionLoginCorrect(responselogin);
 
                 }
             } else {
                 // si no se ha podido logear da fallo code != 200
 
-
                 try {
-                    // obtengo el cuerpo del error
-
+                    // obtengo el cuerpo de la respuesta si ha habido un error
                     String errorBody = response.errorBody().string();
 
-                    //parseo el errorBody para obtener el campo message del servidor
+                    // instancio la utilidad gson
                     Gson gson=new Gson();
 
+                    // lo parsea
                     JsonObject jsonObject = gson.fromJson(errorBody, JsonObject.class);
                     if (jsonObject!=null && jsonObject.has("message") && !jsonObject.get("message").isJsonNull()) {
+                        // obtengo el string con el mensage
                         String messageError=  jsonObject.get("message").getAsString();
 
                         // muestro un toast con el error
-                        devolverResultado(messageError);
+                        showToastMessage(messageError);
                     }
-
-
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
 
-
-
-
         }
-        // fallo en la llamada
+        // fallo en la llamada a al API
         @Override
         public void onFailure(Call<ResponseLogin> call, Throwable t) {
 
 
-            devolverResultado("Error en la conexion");
+            showToastMessage("Error en la conexion");
         }
     }
 

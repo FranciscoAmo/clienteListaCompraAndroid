@@ -26,7 +26,7 @@ public class ResponseLogin {
         private String userPassword;
 
 
-    @SerializedName("message")
+        @SerializedName("message")
         @Expose
         private String message;
 
