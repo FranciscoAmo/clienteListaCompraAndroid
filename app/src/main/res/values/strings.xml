@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ListaDeLaCompra</string>
+    <string name="app_name">Social Grocery cart</string>
     <string name="Title_Inicial">APLICACION LISTA DE LA COMPRA</string>
     <string name="Question_inicial">¿QUE OPCION QUIERES?</string>
     <string name="CreateNewList">Crear una Lista nueva</string>

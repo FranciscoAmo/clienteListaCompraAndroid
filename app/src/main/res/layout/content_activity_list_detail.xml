@@ -73,4 +73,11 @@
             app:srcCompat="@drawable/carrito_foreground" />
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/imagencarga3"
+        android:layout_width="128dp"
+        android:layout_height="140dp"
+        android:layout_gravity="center"
+        app:srcCompat="@mipmap/cambiar_foreground" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

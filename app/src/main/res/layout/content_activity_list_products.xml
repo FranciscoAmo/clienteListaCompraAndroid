@@ -33,4 +33,11 @@
         app:fabSize="mini"
         app:srcCompat="?attr/actionModeCloseDrawable" />
 
+    <ImageView
+        android:id="@+id/imagencarga2"
+        android:layout_width="130dp"
+        android:layout_height="148dp"
+        android:layout_gravity="center"
+        app:srcCompat="@mipmap/cambiar_foreground" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

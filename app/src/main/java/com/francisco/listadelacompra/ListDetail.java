@@ -10,10 +10,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +26,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.francisco.listadelacompra.dialogs.DialogAddUserToList;
+import com.francisco.listadelacompra.dialogs.DialogLoading;
 import com.francisco.listadelacompra.dialogs.PopUpActionsProducts;
 import com.francisco.listadelacompra.models.ListProduct;
 import com.francisco.listadelacompra.models.ProductosBBDD;
@@ -55,7 +59,8 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
     // clases de la vista principal
     private TextView nombreLista;
-    private ListView ListUsersDetail;
+
+    private Spinner ListUsersDetail;
     private ListView ListProductDetail;
 
     // VISTAS
@@ -73,6 +78,7 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
             private TextView cantidadProductosDistintos;
             private TextView cantidadUsuarios;
             private ImageView imagenTipodetail;
+            private TextView total_listaTextView;
 
 
                 // botones fab
@@ -80,6 +86,8 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
             private FloatingActionButton fabaddproduct;
             private FloatingActionButton fabaddUser;
             private FloatingActionButton fabeliminarlista;
+
+            private ImageView imagencarga;
 
 
     //valor de token para realizar las llamadas
@@ -90,6 +98,9 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
     // codigo para devolver el resultado de añadir un producto
     private final int ADD_PRODUCT_CODE =200;
+
+
+    public static int total_lista;
 
 
 
@@ -108,6 +119,8 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
         // leo las preferencias para realizar llamadas
         readPreferences();
+
+
 
     }
 
@@ -128,13 +141,17 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
         fabregresar.setOnClickListener(this);
 
 
+        imagencarga = (ImageView)findViewById(R.id.imagencarga3);
+        imagencarga.setVisibility(View.INVISIBLE);
 
         // vinculo vistas
         nombreLista=(TextView)findViewById(R.id.nameListDetail);
 
+        total_listaTextView = (TextView)findViewById(R.id.totalLista);
+
 
         // para mostrar el listado de usuarios con el adpatador
-        ListUsersDetail=(ListView)findViewById(R.id.ListDetailUsers);
+        ListUsersDetail=(Spinner) findViewById(R.id.spinnerUsers);
 
         // para mostrar el listado de Productos con el adpatador
         ListProductDetail=(ListView)findViewById(R.id.ListDetailProducts);
@@ -143,6 +160,8 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
         cantidadProductosDistintos = (TextView)findViewById(R.id.quantityOfProducts);
         cantidadUsuarios = (TextView)findViewById(R.id.quantityOfUsers);
+
+
 
     }
 
@@ -156,9 +175,27 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
     }
 
+
+
+    // imagen de carga
+    public void animateloading(ImageView imagen){
+        imagen.setVisibility(View.VISIBLE);
+        Animation btnfgiro = AnimationUtils.loadAnimation(this, R.anim.animacion);
+        imagen.startAnimation(btnfgiro);
+
+
+    }
+
+    public void  stoploading(ImageView imagen){
+        imagen.setVisibility(View.INVISIBLE);
+        imagen.setAnimation(null);
+    }
+
+
     @Override
     protected void onResume() {
         super.onResume();
+
         // respuesta correcta a renuevo la pagina
         getList(listacogida.getId());
     }
@@ -166,12 +203,12 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
     // METODO QUE MUETRA EL TOAST
     private void showToastMessage(String message) {
+
         // devuelvo el valor
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 
 
     }
-
 
 
 // OBTENER LOS DATOS DEL INTENT LA PRIMERA VEZ O DE LA API SI SE NAVEGA HACIA ATRAS
@@ -188,7 +225,6 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
     }
 
 
-
     // ADAPTADORES
     public void setAdapters(){
 
@@ -203,10 +239,11 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
         // adaptador usuarios
         adap_personalizadoUsers = new AdaptadorDetailUsersPersonalizado(getApplicationContext(), lista_usuarios);
 
+
         ListUsersDetail.setAdapter(adap_personalizadoUsers);
 
 
-        // aadaptador productos
+        // adaptador productos
          adap_personalizadoProducts = new AdaptadorDetailProductsPersonalizado(getApplicationContext(), lista_productos);
 
         ListProductDetail.setAdapter(adap_personalizadoProducts);
@@ -216,11 +253,17 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
         // coloco los valores en la cantidad de productos y de usuarios
 
         cantidadProductosDistintos.setText("Cantidad: "+listacogida.getProducts().size());
-        cantidadUsuarios.setText("cantidad: " +listacogida.getAssociatedUsers().size());
+        cantidadUsuarios.setText("Cantidad: " +listacogida.getAssociatedUsers().size());
+
+        //si no hay productos pongo el valor a cero
+        if(lista_productos.size()==0){
+            total_listaTextView.setText("Total: 0 €");
+        }
+
+
 
 
     }
-
 
 
 
@@ -230,6 +273,7 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
 
         ListProduct.Product producto = lista_productos.get(position); // obtengo el producto seleccionado
 
@@ -247,8 +291,6 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
 
 
-
-
     // implementacion de la respuesta del dialogo llamo a Retrofit para realizar llamad a la api
     @Override
     public void sendUsertoAdd(String email) {
@@ -259,22 +301,25 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
 
 
+                                    // CALLERS
 
 
-    // CALLERS
     public void eliminarLista(String listid){
-        Call<ListProduct.List> call = RetrofitAdapter.getApiService().removefromList("Bearer " + token,listid);
+        animateloading(imagencarga);
 
+        Call<ListProduct.List> call = RetrofitAdapter.getApiService().removefromList("Bearer " + token,listid);
         call.enqueue(new ResponseRemoveFromListCallback());
 
     }
 
     // llamada para añadir usuario a la lista
     public void addUsertoList(String email ,String listid){
+        animateloading(imagencarga);
 
         Call<ResponseMessageStandar> call = RetrofitAdapter.getApiService().addUser("Bearer "+ token, listid, email );
         call.enqueue(new ResponseAddUserToListCallback());
     }
+
 
 
     public void addProducttoList(String key, String value,int quantity){
@@ -287,6 +332,9 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
         }
 
         if(!exist) {
+
+            animateloading(imagencarga);
+
             Call<ResponseMessageStandar> call = RetrofitAdapter.getApiService().addProduct("Bearer " + token, listacogida.getId(), quantity, key, value);
             call.enqueue(new ResponseAddProductCallBack());
 
@@ -296,21 +344,24 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
     }
 
     public void getList(String listid){
+        animateloading(imagencarga);
         Call<ListProduct.BaseList> call = RetrofitAdapter.getApiService().getOneList("Bearer " + token, listid);
         call.enqueue(new RenewCallBack());
 
     }
 
+    public void setTotal(int total){
+
+        total_listaTextView.setText("TOTAL :"+total+" € ");
+    }
 
 
     // metodo que sale de la actividad
     private void exitActivity() {
-       showToastMessage("eliminandola lista");
+       showToastMessage("eliminando la lista");
 
         this.finish();
     }
-
-
 
 
     // asigno valores a la vista principal
@@ -318,7 +369,6 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
         // establezco nombres en las listas
         nombreLista.setText(listacogida.getNameList().toString());
-
 
     }
 
@@ -389,10 +439,10 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
     }
 
 
-    // ADAPTADORES
+                                         // ADAPTADORES
 
     // ADAPTADOR USUARIOS
-    public class AdaptadorDetailUsersPersonalizado extends ArrayAdapter {
+    public class   AdaptadorDetailUsersPersonalizado extends ArrayAdapter {
 
 
         public AdaptadorDetailUsersPersonalizado(@NonNull Context context, @NonNull ArrayList lista) {
@@ -422,6 +472,43 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
             return listasUsersAdapter;
         }
 
+        @Override
+        public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            LayoutInflater inflater = getLayoutInflater();
+            View listasUsersAdapter = inflater.inflate(R.layout.adapter_list_detail_user, null);
+
+
+            // ojo lo debo buscar a partir del view del adaptador no del principal en este caso "luchadores"
+            nameUserdetail = (TextView) listasUsersAdapter.findViewById(R.id.nameUserdetail);
+            nameUserdetail.setText(lista_usuarios.get(position).getDisplayName().toString());
+
+
+
+            emailUserdetail = (TextView) listasUsersAdapter.findViewById(R.id.emailUserDetail);
+            emailUserdetail.setText((lista_usuarios.get(position).getEmail().toString()));
+
+
+            return listasUsersAdapter;
+
+        }
+
+        @Override
+        public int getCount() {
+            return lista_usuarios.size();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+
+
 
     }
 
@@ -435,6 +522,7 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
             super(context, R.layout.adapter_users_list, lista_productos);
             context = getContext();
             lista = lista_productos;
+
         }
 
         @NonNull
@@ -444,6 +532,11 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
             LayoutInflater inflater = getLayoutInflater();
             View listasProductsAdapter = inflater.inflate(R.layout.adapter_list_products_detail, null);
 
+
+
+            if(position==0){
+                total_lista=0;
+            }
 
             // ojo lo debo buscar a partir del view del adaptador no del principal en este caso "lista"
             imagenTipodetail = (ImageView)listasProductsAdapter.findViewById(R.id.imagenTipo);
@@ -462,12 +555,20 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
              typeProductdetail.setText(lista_productos.get(position).getProduct().getTipo().toString());
              cantidadProductdetail.setText(lista_productos.get(position).getQuantity().toString());
              unidadProductdetail.setText(lista_productos.get(position).getProduct().getMed().toString());
-             precioProductdetail.setText(lista_productos.get(position).getProduct().getPrecio().toString());
+             precioProductdetail.setText(lista_productos.get(position).getProduct().getPrecio().toString()+" € ");
 
              int total =lista_productos.get(position).getProduct().getPrecio()*lista_productos.get(position).getQuantity();
              // realizo el calculo del precio * cantidad
              totalProductdetail.setText(total+" € ");
 
+
+             // sumo al total de la lista
+
+                total_lista = total_lista+total;
+
+                 if(position == (lista_productos.size()-1)){
+                    setTotaladapter(total_lista);
+                }
              // seteo la imagen segun el tipo
 
 
@@ -486,12 +587,11 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
             switch(typeProduct){
                 case "aperitivo":
                     id = R.mipmap.aperitivo;
-                break;
-
+                    break;
                 case "bebida":
                     id = R.mipmap.bebida;
                     break;
-               case "carne":
+                case "carne":
                     id = R.mipmap.carne;
                     break;
                 case "condimentos":
@@ -533,19 +633,34 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
 
 
+            public void setTotaladapter(int total) {
+
+                 setTotal(total);
+            }
+
+            public void getDropdownView(){
+
+
+            }
+
+
     }
-    // RESPUESTAS DE La API
+
+                                                // RESPUESTAS DE LA API
+
 
     // RESPUESTA DE LA API PARA SALIR DE LA LISTA
     private class ResponseRemoveFromListCallback implements retrofit2.Callback<ListProduct.List> {
         @Override
         public void onResponse(Call<ListProduct.List> call, Response<ListProduct.List> response) {
+            stoploading(imagencarga);
 
             // peticion correcta code 200
             if (response.isSuccessful()) {
 
                 // si no se ha podido logear da fallo code != 201
                 if (response.code() == 200) {
+
                     // Salgo de la actividad
                     exitActivity();
 
@@ -569,6 +684,7 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
                             // muestro un toast con el error
                             showToastMessage(messageError);
+
                             // si se a detenido por la autentidicacion vamos al login
                             if(messageError.equals("No tienes autorizacion")|| messageError.equals("tiempo expirado vulevete a loggear")){
                                 // hago que vaya al login
@@ -583,6 +699,7 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
                     } catch (IOException e) {
                         e.printStackTrace();
+
                     }
                 }
 
@@ -593,15 +710,20 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
         @Override
         public void onFailure(Call<ListProduct.List> call, Throwable t) {
+            stoploading(imagencarga);
             showToastMessage("ERROR EN EL SERVIDOR");
+
         }
     }
+
 
     // RESPUESTA DE LA API PARA AÑADIR UN USUARIO
     private class ResponseAddUserToListCallback implements retrofit2.Callback<ResponseMessageStandar> {
         @Override
         public void onResponse(Call<ResponseMessageStandar> call, Response<ResponseMessageStandar> response) {
+            stoploading(imagencarga);
             if(response.isSuccessful()){
+
 
                 String mensage = response.body().getMessage().toString();
                 boolean succes = response.body().isSuccess();
@@ -610,6 +732,7 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
                 // respuesta correcta a renuevo la pagina
                getList(listacogida.getId());
+
 
             }else{
                 // si no se ha podido logear da fallo code != 200
@@ -629,6 +752,7 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
                         // muestro un toast con el error
                         showToastMessage(messageError);
+
                         // si se a detenido por la autentidicacion vamos al login
                         if(messageError.equals("No tienes autorizacion")|| messageError.equals("tiempo expirado vulevete a loggear")){
                             // hago que vaya al login
@@ -642,6 +766,7 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
                 } catch (IOException e) {
                     e.printStackTrace();
+
                 }
 
             }
@@ -651,7 +776,10 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
         @Override
         public void onFailure(Call<ResponseMessageStandar> call, Throwable t) {
+            stoploading(imagencarga);
+
                 showToastMessage("ERROR EN EL SERVIDOR");
+
         }
     }
 
@@ -663,6 +791,7 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
     public  class ResponseAddProductCallBack implements retrofit2.Callback<ResponseMessageStandar> {
         @Override
         public void onResponse(Call<ResponseMessageStandar> call, Response<ResponseMessageStandar> response) {
+            stoploading(imagencarga);
             if(response.isSuccessful()) {
 
                 String mensage = response.body().getMessage().toString();
@@ -672,6 +801,7 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
                 // obtengo la nueva lista
                 getList(listacogida.getId().toString());
+
             }else{
                 // si no se ha podido logear da fallo code != 200
 
@@ -690,6 +820,7 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
                         // muestro un toast con el error
                         showToastMessage(messageError);
+
                         // si se a detenido por la autentidicacion vamos al login
                         if(messageError.equals("No tienes autorizacion")|| messageError.equals("tiempo expirado vulevete a loggear")){
                             // hago que vaya al login
@@ -703,6 +834,7 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
                 } catch (IOException e) {
                     e.printStackTrace();
+
                 }
 
 
@@ -714,7 +846,9 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
         @Override
         public void onFailure(Call<ResponseMessageStandar> call, Throwable t) {
+            stoploading(imagencarga);
             showToastMessage("ERROR EN EL SERVIDOR");
+
         }
     }
 
@@ -722,13 +856,18 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
     private class RenewCallBack implements retrofit2.Callback<ListProduct.BaseList> {
         @Override
         public void onResponse(Call<ListProduct.BaseList> call, Response<ListProduct.BaseList> response) {
+            stoploading(imagencarga);
             if(response.isSuccessful()){
+
+
                 if(response.code()==200 || response.code()==201){
 
                     listacogida= (ListProduct.List)response.body().getList().get(0);
 
                     setAdapters();
+
                 }
+
 
             }else{
                 // si no se ha podido logear da fallo code != 200
@@ -748,6 +887,7 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
                         // muestro un toast con el error
                         showToastMessage(messageError);
+
                         // si se a detenido por la autentidicacion vamos al login
                         if(messageError.equals("No tienes autorizacion")|| messageError.equals("tiempo expirado vulevete a loggear")){
                             // hago que vaya al login
@@ -763,6 +903,7 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
                 } catch (IOException e) {
                     e.printStackTrace();
+
                 }
             }
 
@@ -770,10 +911,14 @@ public class ListDetail extends AppCompatActivity implements DialogAddUserToList
 
         @Override
         public void onFailure(Call<ListProduct.BaseList> call, Throwable t) {
+            stoploading(imagencarga);
           showToastMessage("ERROR EN EL SERVIDOR");
+
         }
     }
 
+
+                // RESPUESTA DE ONACTIVITYRESULT
 
     // RESPUESTA DE LA ACTIVIDAD SELCIONAR PRODUCTO UNA VEZ REALIZADO
     @Override

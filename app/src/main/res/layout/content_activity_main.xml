@@ -22,4 +22,11 @@
         app:backgroundTint="#9BA8DF"
         app:srcCompat="@drawable/ic_llave" />
 
+    <ImageView
+        android:id="@+id/imagencarga"
+        android:layout_width="270dp"
+        android:layout_height="228dp"
+        android:layout_gravity="center"
+        app:srcCompat="@mipmap/cambiar_foreground" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

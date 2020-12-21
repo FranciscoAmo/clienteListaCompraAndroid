@@ -3,6 +3,7 @@ package com.francisco.listadelacompra;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Intent;
@@ -14,11 +15,15 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.francisco.listadelacompra.dialogs.DialogLoading;
 import com.francisco.listadelacompra.models.ResponseLogin;
 import com.francisco.listadelacompra.retrofitUtils.RetrofitAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -43,6 +48,8 @@ public class MainActivity extends AppCompatActivity  {
     public TextView email;
     public TextView password;
     public Button entrar;
+
+    private ImageView imagenCarga;
 
     private FloatingActionButton fabregistrar;
 
@@ -70,6 +77,9 @@ public class MainActivity extends AppCompatActivity  {
     // VINCULACION DE VISTAS
     public void _init(){
 
+        imagenCarga = (ImageView)findViewById(R.id.imagencarga);
+        imagenCarga.setVisibility(View.INVISIBLE);
+
         fabregistrar = (FloatingActionButton)findViewById(R.id.fabregistrar);
 
         email=(TextView)findViewById(R.id.email);
@@ -88,16 +98,19 @@ public class MainActivity extends AppCompatActivity  {
     }
 
 
+    // imagen de carga
+    public void animateloading(ImageView imagen){
+        imagen.setVisibility(View.VISIBLE);
+        Animation btnfgiro = AnimationUtils.loadAnimation(this, R.anim.animacion);
+        imagen.startAnimation(btnfgiro);
 
-    // MUESTRA EL TOOLBAR Y LOS BOTONES
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
 
-        MenuInflater inflate=getMenuInflater();
-        inflate.inflate(R.menu.menu_login,menu);
-        return super.onCreateOptionsMenu(menu);
     }
 
+    public void  stoploading(ImageView imagen){
+        imagen.setVisibility(View.INVISIBLE);
+        imagen.setAnimation(null);
+    }
 
 
 
@@ -125,8 +138,8 @@ public class MainActivity extends AppCompatActivity  {
     public void permisionCheck(){
 
         // Pido permiso para hacer fotos si me lo dan o lo tengo sigo si no salgo
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.INTERNET}, REQUEST_INTERNET);
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.INTERNET}, REQUEST_INTERNET);
 
             Toast.makeText(this, "No se puede Hacer peticiones a la API si no das permiso", Toast.LENGTH_LONG).show();
 
@@ -153,12 +166,18 @@ public class MainActivity extends AppCompatActivity  {
 
     // METODOS DE LLAMADA A LA API
     private void ejecuteLoginAPI(String email, String password){
+
+
+    animateloading(imagenCarga);
+
         // guardo el password
         userPassword = password;
         // llamo a la api
         Call<ResponseLogin> call = RetrofitAdapter.getApiService().logIn(email, password);
         call.enqueue(new ResponseLoginCallback());
+
     }
+
 
 
     // METODO QUE MUETRA EL TOAST
@@ -200,6 +219,7 @@ public class MainActivity extends AppCompatActivity  {
         @Override
         public void onResponse(Call<ResponseLogin> call, Response<ResponseLogin> response) {
 
+            stoploading(imagenCarga);
             // peticion correcta code 200
             if (response.isSuccessful()) {
                 if (response.code() == 200) {
@@ -208,11 +228,15 @@ public class MainActivity extends AppCompatActivity  {
                     ResponseLogin responselogin= response.body();
 
 
+
                     // muestro un toast de que se han logeado correctamente
                     showToastMessage(responselogin.getMessage().toString());
 
+
                     // ejecuto las acciones si se ha registrado correctamente
                     actionLoginCorrect(responselogin);
+
+
 
                 }
             } else {
@@ -231,12 +255,15 @@ public class MainActivity extends AppCompatActivity  {
                         // obtengo el string con el mensage
                         String messageError=  jsonObject.get("message").getAsString();
 
+
                         // muestro un toast con el error
                         showToastMessage(messageError);
+
                     }
 
                 } catch (IOException e) {
                     e.printStackTrace();
+
                 }
             }
 
@@ -245,8 +272,9 @@ public class MainActivity extends AppCompatActivity  {
         @Override
         public void onFailure(Call<ResponseLogin> call, Throwable t) {
 
-
+            stoploading(imagenCarga);
             showToastMessage("Error en la conexion");
+
         }
     }
 

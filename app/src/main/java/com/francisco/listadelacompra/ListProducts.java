@@ -11,12 +11,16 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.francisco.listadelacompra.dialogs.DialogLoading;
 import com.francisco.listadelacompra.dialogs.DialogNewList;
 import com.francisco.listadelacompra.models.ListProduct;
 import com.francisco.listadelacompra.retrofitUtils.RetrofitAdapter;
@@ -42,6 +46,8 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
     FloatingActionButton fab;
     FloatingActionButton fabregresar;
 
+    private ImageView imagencarga;
+
     private ListView Lista;
 
 
@@ -50,6 +56,8 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
     private TextView cantidadUsuarioadaptador;
     private TextView cantidadProductosadaptador;
     private TextView numeroDeListas;
+
+
 
     // ARRAYLIST DE LAS LISTAS A MOSTRAR
     private ArrayList<ListProduct.List> listaToShow = new ArrayList<ListProduct.List>();
@@ -66,6 +74,7 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
 
     // CLASE DEL ADAPTADOR
     AdaptadorPersonalizado adap_personalizado;
+
 
 
     @Override
@@ -107,6 +116,10 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
     // VINCUALCION DE VISTAS
     public void _init() {
 
+
+        imagencarga = (ImageView)findViewById(R.id.imagencarga2);
+        imagencarga.setVisibility(View.INVISIBLE);
+
         numeroDeListas = ( TextView)findViewById(R.id.numOfLists);
 
         // botones floating
@@ -133,6 +146,26 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
 
 
     }
+
+
+
+    // imagen de carga
+    public void animateloading(ImageView imagen){
+        imagen.setVisibility(View.VISIBLE);
+        Animation btnfgiro = AnimationUtils.loadAnimation(this, R.anim.animacion);
+        imagen.startAnimation(btnfgiro);
+
+
+    }
+
+    public void  stoploading(ImageView imagen){
+        imagen.setVisibility(View.INVISIBLE);
+        imagen.setAnimation(null);
+    }
+
+
+
+
 
 
 
@@ -180,7 +213,13 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
 
     // obtengo los valores de la lista
     private void returnValuesFromApi() {
+
+        animateloading(imagencarga);
+
+        // limpio la lista antes de cargar
         listaToShow.clear();
+
+
         // llamo a la api
         Call<ListProduct.BaseList> call = RetrofitAdapter.getApiService().getallList("Bearer " + token);
         call.enqueue(new ResponseListCallback());
@@ -188,6 +227,9 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
 
     // peticion de creacion de listaCon el nombre indicado
     public void createList(String nombre){
+
+        animateloading(imagencarga);
+
         Call<ListProduct.List> call = RetrofitAdapter.getApiService().createList("Bearer " + token,nombre);
         call.enqueue(new ResponseCreateListCallback());
 
@@ -302,10 +344,13 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
     private class ResponseCreateListCallback implements Callback<ListProduct.List> {
             @Override
             public void onResponse(Call<ListProduct.List> call, Response<ListProduct.List> response) {
+
+                stoploading(imagencarga);
                 // peticion correcta code 200
                 if (response.isSuccessful()) {
 
                     returnValuesFromApi();
+
 
                   } else {
                         // si no se ha podido logear da fallo code != 200
@@ -326,8 +371,12 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
                                 // muestro un toast con el error
                                 showToastMessage(messageError);
                                 // si se a detenido por la autentidicacion vamos al login
+
+
+
                                 if(messageError.equals("No tienes autorizacion")|| messageError.equals("tiempo expirado vulevete a loggear")){
-                                    // hago que vaya al login
+
+
                                     // hago que vaya al login
                                     Intent i = new Intent(getApplicationContext(),MainActivity.class);
                                     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -340,6 +389,7 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
 
                         } catch (IOException e) {
                             e.printStackTrace();
+
                         }
                     }
 
@@ -349,7 +399,7 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
 
             @Override
             public void onFailure(Call<ListProduct.List> call, Throwable t) {
-
+                stoploading(imagencarga);
             }
         }
 
@@ -365,6 +415,7 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
     private class ResponseListCallback implements Callback<ListProduct.BaseList> {
         @Override
         public void onResponse(Call<ListProduct.BaseList> call, Response<ListProduct.BaseList> response) {
+            stoploading(imagencarga);
             // peticion correcta code 200
             if (response.isSuccessful()) {
 
@@ -398,9 +449,15 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
 
                         // muestro un toast con el error
                         showToastMessage(messageError);
+
+
+
+
                         // si se a detenido por la autentidicacion vamos al login
                         if(messageError.equals("No tienes autorizacion")|| messageError.equals("tiempo expirado vulevete a loggear")){
-                            // hago que vaya al login
+
+
+
                             // hago que vaya al login
                             Intent i = new Intent(getApplicationContext(),MainActivity.class);
                             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -413,6 +470,7 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
 
                 } catch (IOException e) {
                     e.printStackTrace();
+
                 }
             }
 
@@ -421,7 +479,7 @@ public class ListProducts extends AppCompatActivity implements ListView.OnItemCl
 
         @Override
         public void onFailure(Call<ListProduct.BaseList> call, Throwable t) {
-
+            stoploading(imagencarga);
         }
 
     }

@@ -58,6 +58,7 @@ public class PopUpActionsProducts extends AppCompatActivity implements DialogSel
 
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -205,11 +206,19 @@ public class PopUpActionsProducts extends AppCompatActivity implements DialogSel
     // LLAMADAS A LAS APIS
     public void removeproduct(String key, String value){
 
+
+
+
+
         Call<ResponseMessageStandar> call = RetrofitAdapter.getApiService().removeProductFormList("Bearer "+token, idLista, key, value);
         call.enqueue(new ResponseStandarResponseCallBack());
     }
 
     public void changeValueQuantity(String key, String value,int quantity){
+
+
+
+
         Call<ResponseMessageStandar> call = RetrofitAdapter.getApiService().updateQuantity("Bearer "+token, idLista,quantity, key, value);
         call.enqueue(new ResponseStandarResponseCallBack());
 
@@ -294,6 +303,7 @@ public class PopUpActionsProducts extends AppCompatActivity implements DialogSel
 
                     finish();
 
+
                 }else{
                     // si no se ha podido logear da fallo code != 200
 
@@ -313,6 +323,7 @@ public class PopUpActionsProducts extends AppCompatActivity implements DialogSel
                             // muestro un toast con el error
                             showToastMessage(messageError);
 
+
                             if(messageError.equals("No tienes autorizacion")|| messageError.equals("tiempo expirado vulevete a loggear")){
 
                                 // si ha fallado porque no esta autentificado entonces vuelvo a la pantalla de login
@@ -326,6 +337,7 @@ public class PopUpActionsProducts extends AppCompatActivity implements DialogSel
 
                     } catch (IOException e) {
                         e.printStackTrace();
+
                     }
                 }
             }
@@ -338,6 +350,7 @@ public class PopUpActionsProducts extends AppCompatActivity implements DialogSel
 
             // respuesta correcta muestro un toas
             showToastMessage("Error en la conexion");
+
 
         }
     }

@@ -7,11 +7,15 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.francisco.listadelacompra.dialogs.DialogLoading;
 import com.francisco.listadelacompra.models.ResponseLogin;
 import com.francisco.listadelacompra.retrofitUtils.RetrofitAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -34,12 +38,15 @@ public class Register extends AppCompatActivity {
     public TextView passwordReg;
     public TextView displayNameReg;
 
+    private ImageView imagencarga;
+
     public Button entrarReg;
 
     private FloatingActionButton fabregresar;
 
    // VARIABLE PARA GUARDAR CONTRASEÑA
     private static String userPassword;
+
 
 
     @Override
@@ -58,6 +65,9 @@ public class Register extends AppCompatActivity {
 
     //VINCULA LAS VISTAS
     public void _init(){
+
+        imagencarga = (ImageView)findViewById(R.id.imagencarga1);
+        imagencarga.setVisibility(View.INVISIBLE);
 
         fabregresar = (FloatingActionButton)findViewById(R.id.fabreturn);
 
@@ -78,6 +88,25 @@ public class Register extends AppCompatActivity {
 
 
 
+    // imagen de carga
+    public void animateloading(ImageView imagen){
+        imagen.setVisibility(View.VISIBLE);
+        Animation btnfgiro = AnimationUtils.loadAnimation(this, R.anim.animacion);
+        imagen.startAnimation(btnfgiro);
+
+
+    }
+
+    public void  stoploading(ImageView imagen){
+        imagen.setVisibility(View.INVISIBLE);
+        imagen.setAnimation(null);
+    }
+
+
+
+
+
+
     // EJECUCION AL HACER CLICK
     public void onclick(View view){
 
@@ -95,6 +124,10 @@ public class Register extends AppCompatActivity {
 
     // llamo metodo para regristryCallAPI
     private void regristryCallAPI(String email, String password, String displayName) {
+
+        // animo y muestro la imagen
+        animateloading(imagencarga);
+
         // guardo la variable password
         userPassword=password;
 
@@ -143,6 +176,9 @@ public class Register extends AppCompatActivity {
     private class ResponseRegisterCallback implements Callback<ResponseLogin> {
         @Override
         public void onResponse(Call<ResponseLogin> call, Response<ResponseLogin> response) {
+            stoploading(imagencarga);
+
+
             // peticion correcta code 200
             if (response.isSuccessful()) {
                 if (response.code() == 200) {
@@ -182,6 +218,7 @@ public class Register extends AppCompatActivity {
 
                         // muestro un toast con el error
                         showToastMessage(messageError);
+
                     }
 
 
@@ -197,7 +234,9 @@ public class Register extends AppCompatActivity {
         @Override
         public void onFailure(Call<ResponseLogin> call, Throwable t) {
 
+                stoploading(imagencarga);
               showToastMessage("Error en el servicio");
+
 
         }
     }

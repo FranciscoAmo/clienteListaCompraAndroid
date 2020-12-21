@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.francisco.listadelacompra.adapters.GridAdapter;
+import com.francisco.listadelacompra.dialogs.DialogLoading;
 import com.francisco.listadelacompra.dialogs.DialogSelectQuantity;
 import com.francisco.listadelacompra.models.ProductosBBDD;
 import com.francisco.listadelacompra.retrofitUtils.RetrofitAdapter;
@@ -53,6 +54,8 @@ public class ProductsByType extends AppCompatActivity implements DialogSelectQua
     private FloatingActionButton fabregresar;
 
     private ProductosBBDD.Producto productSelected;
+
+
 
 
     @Override
@@ -278,6 +281,10 @@ public class ProductsByType extends AppCompatActivity implements DialogSelectQua
 
     // llamada a la api
     public void callAPItoPorducts(){
+
+
+
+
         Call<ProductosBBDD.BaseResponse> call = RetrofitAdapter.getApiService().getproductsByType("Bearer "+token,"tipo",tipo);
         call.enqueue(new ResponseListOfProductByTypeCallback());
     }
@@ -295,6 +302,7 @@ public class ProductsByType extends AppCompatActivity implements DialogSelectQua
 
                 // lleno el arraylist de productos
                 fillArrayListOfProducts(listaProductsByType);
+
 
             }else{
                 // si no se ha podido logear da fallo code != 200
@@ -314,6 +322,7 @@ public class ProductsByType extends AppCompatActivity implements DialogSelectQua
 
                         // muestro un toast con el error
                         showToastMessage(messageError);
+
                         // si se a detenido por la autentidicacion vamos al login
                         if(messageError.equals("No tienes autorizacion")|| messageError.equals("tiempo expirado vulevete a loggear")){
                             // hago que vaya al login
@@ -328,6 +337,7 @@ public class ProductsByType extends AppCompatActivity implements DialogSelectQua
 
                 } catch (IOException e) {
                     e.printStackTrace();
+
                 }
 
             }
@@ -337,6 +347,7 @@ public class ProductsByType extends AppCompatActivity implements DialogSelectQua
         @Override
         public void onFailure(Call<ProductosBBDD.BaseResponse> call, Throwable t) {
         showToastMessage("ERROR EN EL SERVIDOR");
+
         }
     }
 
